@@ -58,14 +58,18 @@ public class UserService {
 
     public CompleteUserDto findUserByLogin(String login) {
         User user = userRepository.findUserByLogin(login);
-        return CompleteUserDto.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .login(user.getLogin())
-                .password(user.getPassword())
-                .userRole(user.getRole())
-                .build();
+        if (nonNull(user)) {
+            return CompleteUserDto.builder()
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .email(user.getEmail())
+                    .login(user.getLogin())
+                    .password(user.getPassword())
+                    .userRole(user.getRole())
+                    .build();
+        } else {
+            return null;
+        }
     }
 
     public String loginUser(UserDto userDto) throws UnsupportedEncodingException, WrongUserCredentialsException {
