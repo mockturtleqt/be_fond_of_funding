@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -27,8 +29,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 
-import static by.bsuir.crowdfunding.utils.JwtUtils.TOKEN_PREFIX;
-import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -65,8 +65,11 @@ public class UserController {
     public ResponseEntity login(@RequestBody @Valid @ApiParam(value = "request") UserDto userDto) throws UnsupportedEncodingException, WrongUserCredentialsException {
         HttpHeaders responseHeaders = new HttpHeaders();
         String jwt = userService.loginUser(userDto);
-        responseHeaders.set(AUTHORIZATION, TOKEN_PREFIX + jwt);
-        return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
+        Map<String, String> map = new HashMap<>();
+        map.put("token", jwt);
+        return new ResponseEntity<>(map, responseHeaders, HttpStatus.OK);
+//        responseHeaders.set(AUTHORIZATION, TOKEN_PREFIX + jwt);
+//        return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
     }
 
     @ResponseStatus(OK)
