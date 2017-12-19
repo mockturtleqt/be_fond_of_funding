@@ -12,11 +12,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import by.bsuir.crowdfunding.exception.AuthorizationTokenException;
 import by.bsuir.crowdfunding.exception.NotEnoughMoneyException;
 import by.bsuir.crowdfunding.exception.ValueNotFoundException;
 import by.bsuir.crowdfunding.exception.WrongUserCredentialsException;
-import lombok.extern.slf4j.Slf4j;
 import by.bsuir.crowdfunding.rest.Error;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -86,6 +87,11 @@ public class ExceptionHandlerController {
 
     @ExceptionHandler({WrongUserCredentialsException.class})
     public ResponseEntity handleWrongUserCredentialsException(WrongUserCredentialsException e) {
+        return new ResponseEntity<>(e.getErrors(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({AuthorizationTokenException.class})
+    public ResponseEntity handleAuthorizationTokenException(AuthorizationTokenException e) {
         return new ResponseEntity<>(e.getErrors(), HttpStatus.BAD_REQUEST);
     }
 }

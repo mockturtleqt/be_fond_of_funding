@@ -1,12 +1,8 @@
 package by.bsuir.crowdfunding.model;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -19,7 +15,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import by.bsuir.crowdfunding.model.enumeration.JobStatus;
@@ -41,16 +36,6 @@ public class ScheduledJob implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    /*@GenericGenerator(
-            name = "SCHEDULED_JOB_ID_GENERATOR",
-            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
-            parameters = {
-                    @Parameter(name = "sequence_name", value = "be_fond_of_funding.SCHEDULED_JOB_ID_SEQ"),
-                    @Parameter(name = "initial_value", value = "1"),
-                    @Parameter(name = "increment_size", value = "1")
-            }
-    )
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SCHEDULED_JOB_ID_GENERATOR")*/
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

@@ -16,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 
 import javax.validation.Valid;
 
+import by.bsuir.crowdfunding.exception.AuthorizationTokenException;
 import by.bsuir.crowdfunding.exception.WrongUserCredentialsException;
 import by.bsuir.crowdfunding.rest.CompleteUserDto;
 import by.bsuir.crowdfunding.rest.UserDto;
@@ -46,12 +47,13 @@ public class UserController {
 
     @ResponseStatus(OK)
     @ApiOperation("Link to register user in the system.")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "User was registered.", response = Void.class),
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Link to confirm registration was sent to your email.", response = String.class),
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
     @RequestMapping(method = POST, path = "/registerUser")
-    public void registerUser(@RequestBody @Valid @ApiParam(value = "request") CompleteUserDto userDto) {
+    public String registerUser(@RequestBody @Valid @ApiParam(value = "request") CompleteUserDto userDto) {
         userService.registerUser(userDto);
+        return "Link to confirm registration was sent to your email address. Please confirm registration.";
     }
 
     @ResponseStatus(OK)
@@ -73,8 +75,19 @@ public class UserController {
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
     @RequestMapping(method = GET, path = "/findUserByLogin")
-    public CompleteUserDto getCurrentCalValByLdz(@RequestParam(name = "login") String login) {
-        return userService.findUserByLogin(login);
+    public CompleteUserDto findUserByLogin(@RequestParam(name = "login") String login) {
+        return userService.findEnabledUserByLogin(login);
+    }
+
+    @ResponseStatus(OK)
+    @ApiOperation("Confirm user registration")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Tells whether registration is confirmed", response = String.class),
+            @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
+            @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
+    @RequestMapping(method = GET, path = "/confirmRegistration")
+    public String confirmRegistration(@RequestParam(name = "token") String token) throws AuthorizationTokenException {
+        userService.confirmRegistration(token);
+        return "Your registration was confirmed";
     }
 
 }

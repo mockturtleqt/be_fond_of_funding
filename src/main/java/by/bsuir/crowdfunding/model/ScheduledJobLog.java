@@ -1,8 +1,5 @@
 package by.bsuir.crowdfunding.model;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -37,16 +34,6 @@ public class ScheduledJobLog implements Serializable {
     private static final int MAX_MESSAGE_LENGTH = 2048;
 
     @Id
-    /*@GenericGenerator(
-            name = "SCHEDULED_JOB_LOG_ID_GENERATOR",
-            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
-            parameters = {
-                    @Parameter(name = "sequence_name", value = "be_fond_of_funding.SCHEDULED_JOB_LOG_ID_SEQ"),
-                    @Parameter(name = "initial_value", value = "1"),
-                    @Parameter(name = "increment_size", value = "1")
-            }
-    )
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SCHEDULED_JOB_LOG_ID_GENERATOR")*/
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

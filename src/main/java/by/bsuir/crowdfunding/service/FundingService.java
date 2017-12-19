@@ -21,6 +21,8 @@ import by.bsuir.crowdfunding.repository.UserRepository;
 import by.bsuir.crowdfunding.rest.Error;
 import by.bsuir.crowdfunding.rest.FundingDto;
 
+import static java.util.Objects.nonNull;
+
 @Service
 @Transactional(propagation = Propagation.REQUIRED)
 public class FundingService {
@@ -41,14 +43,16 @@ public class FundingService {
     public FundingInfo fundProject(FundingDto fundingDto) throws NotEnoughMoneyException {
         User user = userRepository.findOne(fundingDto.getUserId());
         Project project = projectRepository.findOne(fundingDto.getProjectId());
-        if (user.getBalance().compareTo(fundingDto.getAmountOfMoney()) >= 0) {
-            updateUserBalance(user, fundingDto.getAmountOfMoney());
-            updateProjectBalance(project, fundingDto.getAmountOfMoney());
-            return fundingInfoRepository.save(convertToModelFromDto(fundingDto, user, project));
-        } else {
-            throw new NotEnoughMoneyException(Collections.singletonList(buildNotEnoughMoneyError()));
+        if (nonNull(user) && nonNull(project)) {
+            if (user.getBalance().compareTo(fundingDto.getAmountOfMoney()) >= 0) {
+                updateUserBalance(user, fundingDto.getAmountOfMoney());
+                updateProjectBalance(project, fundingDto.getAmountOfMoney());
+                return fundingInfoRepository.save(convertToModelFromDto(fundingDto, user, project));
+            } else {
+                throw new NotEnoughMoneyException(Collections.singletonList(buildNotEnoughMoneyError()));
+            }
         }
-
+        return null;
     }
 
     private FundingInfo convertToModelFromDto(FundingDto fundingDto, User user, Project project) {
