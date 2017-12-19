@@ -49,6 +49,16 @@ public class ProjectController {
     }
 
     @ResponseStatus(OK)
+    @ApiOperation("Link approve projects (projects ids should be passed as parameters).")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Project was approved", response = Void.class),
+            @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
+            @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
+    @RequestMapping(method = POST, path = "/admin/project/approveProjects")
+    public void approveProject(@RequestBody @ApiParam(value = "request") List<Long> idsOfProjects) {
+        projectService.approveProject(idsOfProjects);
+    }
+
+    @ResponseStatus(OK)
     @ApiOperation("Get active projects by name.")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Project info", response = ProjectDto.class),
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
@@ -56,6 +66,16 @@ public class ProjectController {
     @RequestMapping(method = GET, path = "/project/findProjectByName")
     public List<ProjectDto> findProjectByName(@RequestParam(name = "name") String name) {
         return projectService.findActiveProjectsByName(name);
+    }
+
+    @ResponseStatus(OK)
+    @ApiOperation("Get active projects.")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Project info", response = ProjectDto.class),
+            @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
+            @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
+    @RequestMapping(method = GET, path = "/project/findActiveProjects")
+    public List<ProjectDto> findActiveProjects() {
+        return projectService.findAllActiveProjects();
     }
 
     @ResponseStatus(OK)
@@ -70,7 +90,7 @@ public class ProjectController {
 
     @ResponseStatus(OK)
     @ApiOperation("Get all non approved projects.")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Non approved projects", response = ProjectDto.class),
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Non approved projects", response = Project.class),
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
     @RequestMapping(method = GET, path = "/admin/project/findNonApproved")
