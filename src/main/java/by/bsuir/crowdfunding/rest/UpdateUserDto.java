@@ -6,10 +6,8 @@ import lombok.*;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -20,37 +18,31 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
-public class ProjectDto {
-
-    @NotBlank
-    @ApiModelProperty(required = true)
-    @Size(max = 50)
-    private String name;
-
-    @NotBlank
-    @ApiModelProperty(required = true)
-    private String description;
-
-    @NotNull
-    @ApiModelProperty(required = true)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate dueDate;
-
-    @NotNull
-    @ApiModelProperty(required = true)
-    @Min(0)
-    private BigDecimal minimalMoneyAmount;
-
-    @Min(0)
-    private BigDecimal actualMoneyAmount;
-
-    private String picture;
-
-    private String additionalInfo;
+public class UpdateUserDto {
 
     @NotNull
     @ApiModelProperty(required = true)
     private Long userId;
 
-    private Long projectId;
+    @NotBlank
+    @ApiModelProperty(required = true)
+    @Size(max = 20)
+    private String firstName;
+
+    @NotBlank
+    @ApiModelProperty(required = true)
+    @Size(max = 20)
+    private String lastName;
+
+    @ApiModelProperty
+    @Size(max = 30)
+    private String phoneNumber;
+
+    @ApiModelProperty
+    private String profilePicture;
+
+    @ApiModelProperty(required = true)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate birthDate;
 }
+

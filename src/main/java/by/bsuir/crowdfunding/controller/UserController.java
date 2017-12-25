@@ -1,38 +1,31 @@
 package by.bsuir.crowdfunding.controller;
 
 
-import by.bsuir.crowdfunding.model.Project;
-import by.bsuir.crowdfunding.rest.UserBalanceDto;
-import by.bsuir.crowdfunding.service.ProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.validation.Valid;
-
 import by.bsuir.crowdfunding.exception.AuthorizationTokenException;
+import by.bsuir.crowdfunding.exception.ValueNotFoundException;
 import by.bsuir.crowdfunding.exception.WrongUserCredentialsException;
-import by.bsuir.crowdfunding.rest.CompleteUserDto;
-import by.bsuir.crowdfunding.rest.UserDto;
+import by.bsuir.crowdfunding.model.Project;
+import by.bsuir.crowdfunding.rest.*;
+import by.bsuir.crowdfunding.rest.Error;
+import by.bsuir.crowdfunding.service.ProjectService;
 import by.bsuir.crowdfunding.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -58,20 +51,19 @@ public class UserController {
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
     @RequestMapping(method = POST, path = "/registerUser")
-    public String registerUser(@RequestBody @Valid @ApiParam(value = "request") CompleteUserDto userDto) {
+    public String registerUser(@RequestBody @Valid @ApiParam(value = "request") RegisterUserDto userDto) {
         userService.registerUser(userDto);
         return "Link to confirm registration was sent to your email address. Please confirm registration.";
     }
 
     @ResponseStatus(OK)
     @ApiOperation("Link to update user info.")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "User was updated", response = String.class),
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "User was updated", response = Void.class),
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
     @RequestMapping(method = POST, path = "/updateUser")
-    public String updateUser(@RequestBody @Valid @ApiParam(value = "request") CompleteUserDto userDto) {
+    public void updateUser(@RequestBody @Valid @ApiParam(value = "request") UpdateUserDto userDto) {
         userService.updateUser(userDto);
-        return "Link to confirm registration was sent to your email address. Please confirm registration.";
     }
 
     @ResponseStatus(OK)
@@ -80,7 +72,7 @@ public class UserController {
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
     @RequestMapping(method = POST, path = "/addMoneyToUserBalance")
-    public void addMoneyToUserBalance(@RequestBody @Valid @ApiParam(value = "request") UserBalanceDto userBalanceDto) {
+    public void addMoneyToUserBalance(@RequestBody @Valid @ApiParam(value = "request") UserBalanceDto userBalanceDto) throws ValueNotFoundException {
         userService.addMoneyToUserBalance(userBalanceDto);
     }
 
@@ -134,7 +126,7 @@ public class UserController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Project info", response = Project.class, responseContainer = "List"),
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
-    @RequestMapping(method = GET, path = "/findApprovedProjectsByFinancerId")
+    @RequestMapping(method = GET, path = "/findApprovedProjectsByAuthorId")
     public List<Project> findApprovedProjectsByAuthorId(@RequestParam(name = "authorId") Long authorId) {
         return projectService.findApprovedProjectsByAuthorId(authorId);
     }
@@ -144,7 +136,7 @@ public class UserController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Project info", response = Project.class, responseContainer = "List"),
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
-    @RequestMapping(method = GET, path = "/findPNonApprovedrojectsByFinancerId")
+    @RequestMapping(method = GET, path = "/findNonApprovedrojectsByAuthorId")
     public List<Project> findNonApprovedProjectsByAuthorId(@RequestParam(name = "authorId") Long authorId) {
         return projectService.findNonApprovedProjectsByAuthorId(authorId);
     }

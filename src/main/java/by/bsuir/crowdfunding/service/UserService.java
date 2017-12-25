@@ -1,14 +1,13 @@
 package by.bsuir.crowdfunding.service;
 
 import by.bsuir.crowdfunding.exception.AuthorizationTokenException;
+import by.bsuir.crowdfunding.exception.ValueNotFoundException;
 import by.bsuir.crowdfunding.exception.WrongUserCredentialsException;
 import by.bsuir.crowdfunding.model.FundingInfo;
 import by.bsuir.crowdfunding.model.User;
 import by.bsuir.crowdfunding.repository.UserRepository;
-import by.bsuir.crowdfunding.rest.CompleteUserDto;
+import by.bsuir.crowdfunding.rest.*;
 import by.bsuir.crowdfunding.rest.Error;
-import by.bsuir.crowdfunding.rest.UserBalanceDto;
-import by.bsuir.crowdfunding.rest.UserDto;
 import by.bsuir.crowdfunding.utils.ConverterUtils;
 import by.bsuir.crowdfunding.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static by.bsuir.crowdfunding.model.enumeration.UserRole.USER;
+import static by.bsuir.crowdfunding.utils.ExceptionBuilder.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -56,7 +54,7 @@ public class UserService {
         this.fundingService = fundingService;
     }
 
-    public User registerUser(CompleteUserDto userDto) {
+    public User registerUser(RegisterUserDto userDto) {
         User user = userRepository.findUserByLogin(userDto.getLogin());
         List<Error> errors = new ArrayList<>();
         if (isNull(user)) {
@@ -65,7 +63,6 @@ public class UserService {
                     .lastName(userDto.getLastName())
                     .email(userDto.getEmail())
                     .login(userDto.getLogin())
-                    .birthDate(ConverterUtils.convertLocalDateToTimestamp(userDto.getBirthDate()))
                     .password(encoder.encode(userDto.getPassword()))
                     .balance(BigDecimal.ZERO)
                     .role(USER)
@@ -93,27 +90,33 @@ public class UserService {
         return user;
     }
 
-    public User updateUser(CompleteUserDto userDto) {
-        if (nonNull(userDto)) {
-            User user = User.builder()
+    public User updateUser(UpdateUserDto userDto) {
+        User user = userRepository.findOne(userDto.getUserId());
+        if (nonNull(user)) {
+            user = User.builder()
                     .firstName(userDto.getFirstName())
                     .lastName(userDto.getLastName())
                     .birthDate(ConverterUtils.convertLocalDateToTimestamp(userDto.getBirthDate()))
+                    .phoneNumber(userDto.getPhoneNumber())
+                    .profilePicture(userDto.getProfilePicture())
                     .build();
             user = userRepository.save(user);
             return user;
         } else return null;
     }
 
-    public User addMoneyToUserBalance(UserBalanceDto userBalanceDto) {
+    public User addMoneyToUserBalance(UserBalanceDto userBalanceDto) throws ValueNotFoundException {
         User user = userRepository.findOne(userBalanceDto.getUserId());
-        BigDecimal currentBalance = user.getBalance();
-        if (nonNull(currentBalance)) {
-            user.setBalance(currentBalance.add(userBalanceDto.getMoneyToAdd()));
-        } else {
-            user.setBalance(userBalanceDto.getMoneyToAdd());
+        if (nonNull(user)) {
+            BigDecimal currentBalance = user.getBalance();
+            if (nonNull(currentBalance)) {
+                user.setBalance(currentBalance.add(userBalanceDto.getMoneyToAdd()));
+            } else {
+                user.setBalance(userBalanceDto.getMoneyToAdd());
+            }
+            return userRepository.save(user);
         }
-        return userRepository.save(user);
+        throw new ValueNotFoundException(Collections.singletonList(buildNoSuchUserException(userBalanceDto.getUserId())));
     }
 
     public CompleteUserDto findEnabledUserByLogin(String login) {
@@ -145,28 +148,14 @@ public class UserService {
             if (BCrypt.checkpw(userDto.getPassword(), user.getPassword())) {
                 return jwtUtils.generateJwt(user);
             }
-            throw new WrongUserCredentialsException(createWrongUserPasswordException());
+            throw new WrongUserCredentialsException(buildWrongUserPasswordException());
         }
-        throw new WrongUserCredentialsException(createWrongUserLoginException());
+        throw new WrongUserCredentialsException(buildWrongUserLoginException());
     }
 
     public void confirmRegistration(String token) throws AuthorizationTokenException {
         User user = verificationTokenService.getUserFromToken(token);
         user.setEnabled(true);
         userRepository.save(user);
-    }
-
-    private List<Error> createWrongUserLoginException() {
-        return Collections.singletonList(Error.builder()
-                .code("400")
-                .message("Login is incorrect")
-                .build());
-    }
-
-    private List<Error> createWrongUserPasswordException() {
-        return Collections.singletonList(Error.builder()
-                .code("400")
-                .message("Password is incorrect")
-                .build());
     }
 }

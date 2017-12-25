@@ -1,18 +1,8 @@
 package by.bsuir.crowdfunding.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-
 import by.bsuir.crowdfunding.exception.NotEnoughMoneyException;
+import by.bsuir.crowdfunding.exception.ValueNotFoundException;
 import by.bsuir.crowdfunding.model.FundingInfo;
 import by.bsuir.crowdfunding.model.Project;
 import by.bsuir.crowdfunding.model.User;
@@ -21,7 +11,20 @@ import by.bsuir.crowdfunding.repository.ProjectRepository;
 import by.bsuir.crowdfunding.repository.UserRepository;
 import by.bsuir.crowdfunding.rest.Error;
 import by.bsuir.crowdfunding.rest.FundingDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static by.bsuir.crowdfunding.utils.ExceptionBuilder.*;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Service
@@ -41,9 +44,10 @@ public class FundingService {
         this.projectRepository = projectRepository;
     }
 
-    public FundingInfo fundProject(FundingDto fundingDto) throws NotEnoughMoneyException {
+    public FundingInfo fundProject(FundingDto fundingDto) throws NotEnoughMoneyException, ValueNotFoundException {
         User user = userRepository.findOne(fundingDto.getUserId());
         Project project = projectRepository.findOne(fundingDto.getProjectId());
+        List<Error> errors = new ArrayList<>();
         if (nonNull(user) && nonNull(project)) {
             if (user.getBalance().compareTo(fundingDto.getAmountOfMoney()) >= 0) {
                 updateUserBalance(user, fundingDto.getAmountOfMoney());
@@ -52,6 +56,15 @@ public class FundingService {
             } else {
                 throw new NotEnoughMoneyException(Collections.singletonList(buildNotEnoughMoneyError()));
             }
+        }
+        if (isNull(user)) {
+            errors.add(buildNoSuchUserException(fundingDto.getUserId()));
+        }
+        if (isNull(project)) {
+            errors.add(buildNoSuchProjectException(fundingDto.getProjectId()));
+        }
+        if (!errors.isEmpty()) {
+            throw new ValueNotFoundException(errors);
         }
         return null;
     }
@@ -81,13 +94,5 @@ public class FundingService {
     private void updateProjectBalance(Project project, BigDecimal amountOfMoney) {
         project.setActualMoneyAmount(project.getActualMoneyAmount().add(amountOfMoney));
         projectRepository.save(project);
-    }
-
-    private Error buildNotEnoughMoneyError() {
-        return Error.builder()
-                .code("400")
-                .message("Not enough money")
-                .description("There's not enough money on your balance. You can put money on your balance using a credit card")
-                .build();
     }
 }

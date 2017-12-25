@@ -1,6 +1,11 @@
 package by.bsuir.crowdfunding.service;
 
+import by.bsuir.crowdfunding.converter.ProjectConverter;
 import by.bsuir.crowdfunding.model.FundingInfo;
+import by.bsuir.crowdfunding.model.Project;
+import by.bsuir.crowdfunding.repository.ProjectRepository;
+import by.bsuir.crowdfunding.repository.UserRepository;
+import by.bsuir.crowdfunding.rest.ProjectDto;
 import by.bsuir.crowdfunding.utils.ConverterUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,18 +13,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import by.bsuir.crowdfunding.converter.ProjectConverter;
-import by.bsuir.crowdfunding.model.Project;
-import by.bsuir.crowdfunding.repository.ProjectRepository;
-import by.bsuir.crowdfunding.repository.UserRepository;
-import by.bsuir.crowdfunding.rest.ProjectDto;
+import static java.util.Objects.nonNull;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED)
@@ -58,19 +56,23 @@ public class ProjectService {
     }
 
     public Project updateProject(ProjectDto projectDto) {
-        Project project = Project.builder()
-                .name(projectDto.getName())
-                .description(projectDto.getDescription())
-                .dueDate(ConverterUtils.convertLocalDateToTimestamp(projectDto.getDueDate()))
-                .minimalMoneyAmount(projectDto.getMinimalMoneyAmount())
-                .actualMoneyAmount(BigDecimal.ZERO)
-                .picture(projectDto.getPicture())
-                .additionalInfo(projectDto.getAdditionalInfo())
-                .user(userRepository.findOne(projectDto.getUserId()))
-                .isActive(false)
-                .isApproved(false)
-                .build();
-        return projectRepository.save(project);
+        Project project = projectRepository.findOne(projectDto.getProjectId());
+        if (nonNull(project)) {
+            project = Project.builder()
+                    .id(project.getId())
+                    .name(projectDto.getName())
+                    .description(projectDto.getDescription())
+                    .dueDate(ConverterUtils.convertLocalDateToTimestamp(projectDto.getDueDate()))
+                    .minimalMoneyAmount(projectDto.getMinimalMoneyAmount())
+                    .actualMoneyAmount(BigDecimal.ZERO)
+                    .picture(projectDto.getPicture())
+                    .additionalInfo(projectDto.getAdditionalInfo())
+                    .user(userRepository.findOne(projectDto.getUserId()))
+                    .isActive(false)
+                    .isApproved(false)
+                    .build();
+            return projectRepository.save(project);
+        } else return null;
     }
 
     public List<ProjectDto> findActiveProjectsByName(String name) {

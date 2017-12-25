@@ -1,5 +1,10 @@
 package by.bsuir.crowdfunding.service;
 
+import by.bsuir.crowdfunding.exception.AuthorizationTokenException;
+import by.bsuir.crowdfunding.model.User;
+import by.bsuir.crowdfunding.model.VerificationToken;
+import by.bsuir.crowdfunding.repository.VerificationTokenRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -11,17 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import by.bsuir.crowdfunding.exception.AuthorizationTokenException;
-import by.bsuir.crowdfunding.model.User;
-import by.bsuir.crowdfunding.model.VerificationToken;
-import by.bsuir.crowdfunding.repository.VerificationTokenRepository;
-import by.bsuir.crowdfunding.rest.Error;
-import lombok.extern.slf4j.Slf4j;
-
+import static by.bsuir.crowdfunding.utils.ExceptionBuilder.buildExpiredTokenException;
+import static by.bsuir.crowdfunding.utils.ExceptionBuilder.buildInvalidTokenException;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -99,23 +98,5 @@ public class VerificationTokenService {
                 .build();
         verificationTokenRepository.save(verificationToken);
         return token;
-    }
-
-    private List<Error> buildExpiredTokenException() {
-        Error error = Error.builder()
-                .code("400")
-                .message("Token has expired")
-                .description("Please register once again and confirm registration via email.")
-                .build();
-        return Collections.singletonList(error);
-    }
-
-    private List<Error> buildInvalidTokenException() {
-        Error error = Error.builder()
-                .code("400")
-                .message("This token doesn't exist.")
-                .description("Please use a valid token.")
-                .build();
-        return Collections.singletonList(error);
     }
 }

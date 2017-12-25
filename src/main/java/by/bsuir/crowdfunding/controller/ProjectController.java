@@ -1,29 +1,22 @@
 package by.bsuir.crowdfunding.controller;
 
 
-import by.bsuir.crowdfunding.model.User;
-import by.bsuir.crowdfunding.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Set;
-
-import javax.validation.Valid;
-
 import by.bsuir.crowdfunding.model.Project;
+import by.bsuir.crowdfunding.model.User;
 import by.bsuir.crowdfunding.rest.ProjectDto;
 import by.bsuir.crowdfunding.service.ProjectService;
+import by.bsuir.crowdfunding.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Set;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -64,7 +57,7 @@ public class ProjectController {
     }
 
     @ResponseStatus(OK)
-    @ApiOperation("Link approve projects (projects ids should be passed as parameters).")
+    @ApiOperation("Link to approve projects (arrray of project ids should be passed as parameters).")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Project was approved", response = Void.class),
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
