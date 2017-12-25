@@ -1,33 +1,17 @@
 package by.bsuir.crowdfunding.model;
 
+import by.bsuir.crowdfunding.model.enumeration.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import lombok.*;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
-
-import by.bsuir.crowdfunding.model.enumeration.UserRole;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 import static by.bsuir.crowdfunding.model.enumeration.UserRole.USER;
 
@@ -74,6 +58,7 @@ public class User implements Serializable {
     @Size(max = 30)
     private String email;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Column(name = "birth_date")
     private Timestamp birthDate;
 

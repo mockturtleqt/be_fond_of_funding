@@ -6,8 +6,8 @@ import by.bsuir.crowdfunding.exception.WrongUserCredentialsException;
 import by.bsuir.crowdfunding.model.FundingInfo;
 import by.bsuir.crowdfunding.model.User;
 import by.bsuir.crowdfunding.repository.UserRepository;
-import by.bsuir.crowdfunding.rest.*;
 import by.bsuir.crowdfunding.rest.Error;
+import by.bsuir.crowdfunding.rest.*;
 import by.bsuir.crowdfunding.utils.ConverterUtils;
 import by.bsuir.crowdfunding.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -93,13 +93,11 @@ public class UserService {
     public User updateUser(UpdateUserDto userDto) {
         User user = userRepository.findOne(userDto.getUserId());
         if (nonNull(user)) {
-            user = User.builder()
-                    .firstName(userDto.getFirstName())
-                    .lastName(userDto.getLastName())
-                    .birthDate(ConverterUtils.convertLocalDateToTimestamp(userDto.getBirthDate()))
-                    .phoneNumber(userDto.getPhoneNumber())
-                    .profilePicture(userDto.getProfilePicture())
-                    .build();
+            user.setFirstName(userDto.getFirstName());
+            user.setLastName(userDto.getLastName());
+            user.setBirthDate(ConverterUtils.convertLocalDateToTimestamp(userDto.getBirthDate()));
+            user.setPhoneNumber(userDto.getPhoneNumber());
+            user.setProfilePicture(userDto.getProfilePicture());
             user = userRepository.save(user);
             return user;
         } else return null;
@@ -119,20 +117,22 @@ public class UserService {
         throw new ValueNotFoundException(Collections.singletonList(buildNoSuchUserException(userBalanceDto.getUserId())));
     }
 
-    public CompleteUserDto findEnabledUserByLogin(String login) {
-        User user = userRepository.findUserByLoginAndEnabled(login, true);
-        if (nonNull(user)) {
-            return CompleteUserDto.builder()
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
-                    .email(user.getEmail())
-                    .login(user.getLogin())
-                    .password(user.getPassword())
-                    .userRole(user.getRole())
-                    .build();
-        } else {
-            return null;
-        }
+    public User findEnabledUserByLogin(String login) {
+        return userRepository.findUserByLoginAndEnabled(login, true);
+//        User user = userRepository.findUserByLoginAndEnabled(login, true);
+//        if (nonNull(user)) {
+//            return CompleteUserDto.builder()
+//                    .firstName(user.getFirstName())
+//                    .lastName(user.getLastName())
+//                    .email(user.getEmail())
+//                    .login(user.getLogin())
+//                    .password(user.getPassword())
+//                    .userRole(user.getRole())
+//                    .userId(user.getId())
+//                    .build();
+//        } else {
+//            return null;
+//        }
     }
 
     public Set<User> findFundersByProejctId(Long projectId) {
@@ -142,7 +142,7 @@ public class UserService {
                 .collect(Collectors.toSet());
     }
 
-    public String loginUser(UserDto userDto) throws UnsupportedEncodingException, WrongUserCredentialsException {
+    public String loginUser(UserLoginDto userDto) throws UnsupportedEncodingException, WrongUserCredentialsException {
         User user = userRepository.findUserByLoginAndEnabled(userDto.getLogin(), true);
         if (nonNull(user)) {
             if (BCrypt.checkpw(userDto.getPassword(), user.getPassword())) {

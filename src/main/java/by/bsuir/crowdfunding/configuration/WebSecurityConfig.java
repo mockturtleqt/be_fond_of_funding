@@ -1,5 +1,8 @@
 package by.bsuir.crowdfunding.configuration;
 
+import by.bsuir.crowdfunding.exception.handler.JwtAuthenticationEntryPoint;
+import by.bsuir.crowdfunding.filter.JwtAuthenticationTokenFilter;
+import by.bsuir.crowdfunding.model.enumeration.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import by.bsuir.crowdfunding.exception.handler.JwtAuthenticationEntryPoint;
-import by.bsuir.crowdfunding.filter.JwtAuthenticationTokenFilter;
-import by.bsuir.crowdfunding.model.enumeration.UserRole;
 
 @SuppressWarnings("SpringJavaAutowiringInspection")
 @Configuration
@@ -53,8 +52,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         HttpMethod.OPTIONS
                 ).permitAll()
-//                .antMatchers("/admin/**").hasAuthority(UserRole.ADMIN.name())
-//                .antMatchers("/user/**").hasAnyAuthority(UserRole.USER.name(), UserRole.ADMIN.name())
+                .antMatchers("/admin/**").hasAuthority(UserRole.ADMIN.name())
+                .antMatchers("/user/**").hasAnyAuthority(UserRole.USER.name(), UserRole.ADMIN.name())
                 .antMatchers(
                         HttpMethod.POST,
                         "/login",

@@ -41,7 +41,7 @@ public class UpdateUserDto {
     @ApiModelProperty
     private String profilePicture;
 
-    @ApiModelProperty(required = true)
+    @ApiModelProperty
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthDate;
 }

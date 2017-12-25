@@ -48,8 +48,6 @@ public class ProjectDto {
 
     private String additionalInfo;
 
-    @NotNull
-    @ApiModelProperty(required = true)
     private Long userId;
 
     private Long projectId;

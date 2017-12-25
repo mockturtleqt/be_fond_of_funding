@@ -22,6 +22,8 @@ import java.time.LocalDate;
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class CompleteUserDto {
 
+    private Long userId;
+
     @NotBlank
     @ApiModelProperty(required = true)
     @Size(max = 20)

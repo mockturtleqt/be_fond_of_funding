@@ -58,19 +58,12 @@ public class ProjectService {
     public Project updateProject(ProjectDto projectDto) {
         Project project = projectRepository.findOne(projectDto.getProjectId());
         if (nonNull(project)) {
-            project = Project.builder()
-                    .id(project.getId())
-                    .name(projectDto.getName())
-                    .description(projectDto.getDescription())
-                    .dueDate(ConverterUtils.convertLocalDateToTimestamp(projectDto.getDueDate()))
-                    .minimalMoneyAmount(projectDto.getMinimalMoneyAmount())
-                    .actualMoneyAmount(BigDecimal.ZERO)
-                    .picture(projectDto.getPicture())
-                    .additionalInfo(projectDto.getAdditionalInfo())
-                    .user(userRepository.findOne(projectDto.getUserId()))
-                    .isActive(false)
-                    .isApproved(false)
-                    .build();
+            project.setName(projectDto.getName());
+            project.setDescription(projectDto.getDescription());
+            project.setAdditionalInfo(projectDto.getAdditionalInfo());
+            project.setDueDate(ConverterUtils.convertLocalDateToTimestamp(projectDto.getDueDate()));
+            project.setMinimalMoneyAmount(projectDto.getMinimalMoneyAmount());
+            project.setPicture(projectDto.getPicture());
             return projectRepository.save(project);
         } else return null;
     }

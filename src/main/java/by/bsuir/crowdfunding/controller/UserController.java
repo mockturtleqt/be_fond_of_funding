@@ -5,8 +5,9 @@ import by.bsuir.crowdfunding.exception.AuthorizationTokenException;
 import by.bsuir.crowdfunding.exception.ValueNotFoundException;
 import by.bsuir.crowdfunding.exception.WrongUserCredentialsException;
 import by.bsuir.crowdfunding.model.Project;
-import by.bsuir.crowdfunding.rest.*;
+import by.bsuir.crowdfunding.model.User;
 import by.bsuir.crowdfunding.rest.Error;
+import by.bsuir.crowdfunding.rest.*;
 import by.bsuir.crowdfunding.service.ProjectService;
 import by.bsuir.crowdfunding.service.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -58,10 +59,10 @@ public class UserController {
 
     @ResponseStatus(OK)
     @ApiOperation("Link to update user info.")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "User was updated", response = Void.class),
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "User was updated"),
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
-    @RequestMapping(method = POST, path = "/updateUser")
+    @RequestMapping(method = POST, path = "user/updateUser")
     public void updateUser(@RequestBody @Valid @ApiParam(value = "request") UpdateUserDto userDto) {
         userService.updateUser(userDto);
     }
@@ -82,7 +83,7 @@ public class UserController {
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
     @RequestMapping(method = POST, path = "/login")
-    public ResponseEntity login(@RequestBody @Valid @ApiParam(value = "request") UserDto userDto) throws UnsupportedEncodingException, WrongUserCredentialsException {
+    public ResponseEntity login(@RequestBody @Valid @ApiParam(value = "request") UserLoginDto userDto) throws UnsupportedEncodingException, WrongUserCredentialsException {
         HttpHeaders responseHeaders = new HttpHeaders();
         String jwt = userService.loginUser(userDto);
         Map<String, String> map = new HashMap<>();
@@ -92,11 +93,11 @@ public class UserController {
 
     @ResponseStatus(OK)
     @ApiOperation("Get user info by name.")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "User info", response = CompleteUserDto.class),
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "User info", response = User.class),
             @ApiResponse(code = 400, message = "Bad request parameters.", response = Error.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Unexpected error.", response = Error.class, responseContainer = "List")})
     @RequestMapping(method = GET, path = "/findUserByLogin")
-    public CompleteUserDto findUserByLogin(@RequestParam(name = "login") String login) {
+    public User findUserByLogin(@RequestParam(name = "login") String login) {
         return userService.findEnabledUserByLogin(login);
     }
 
