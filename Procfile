@@ -1,0 +1,1 @@
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar target/be_fond_of_funding-1.0-SNAPSHOT.jar
