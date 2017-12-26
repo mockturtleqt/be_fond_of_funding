@@ -20,4 +20,6 @@ public interface ProjectRepository extends CrudRepository<Project, Long> {
     List<Project> findByDueDateBeforeAndIsActive(Timestamp now, boolean isActive);
 
     List<Project> findAllByUserId(Long userId);
+
+    List<Project> findByName(String name);
 }

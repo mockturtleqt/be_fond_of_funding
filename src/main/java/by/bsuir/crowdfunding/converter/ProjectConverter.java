@@ -14,6 +14,8 @@ public class ProjectConverter implements Converter<Project, ProjectDto> {
     @Override
     public ProjectDto convertModelToDto(Project project) {
         return ProjectDto.builder()
+                .projectId(project.getId())
+                .userId(project.getUser().getId())
                 .name(project.getName())
                 .description(project.getDescription())
                 .dueDate(project.getDueDate().toLocalDateTime().toLocalDate())
