@@ -1,12 +1,5 @@
 package by.bsuir.crowdfunding.service;
 
-import by.bsuir.crowdfunding.converter.ProjectConverter;
-import by.bsuir.crowdfunding.model.FundingInfo;
-import by.bsuir.crowdfunding.model.Project;
-import by.bsuir.crowdfunding.repository.ProjectRepository;
-import by.bsuir.crowdfunding.repository.UserRepository;
-import by.bsuir.crowdfunding.rest.ProjectDto;
-import by.bsuir.crowdfunding.utils.ConverterUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -16,6 +9,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import by.bsuir.crowdfunding.converter.ProjectConverter;
+import by.bsuir.crowdfunding.model.FundingInfo;
+import by.bsuir.crowdfunding.model.Project;
+import by.bsuir.crowdfunding.repository.ProjectRepository;
+import by.bsuir.crowdfunding.repository.UserRepository;
+import by.bsuir.crowdfunding.rest.ProjectDto;
+import by.bsuir.crowdfunding.utils.ConverterUtils;
 
 import static java.util.Objects.nonNull;
 
@@ -69,7 +70,7 @@ public class ProjectService {
     }
 
     public List<ProjectDto> findActiveProjectsByName(String name) {
-        return projectConverter.convertModelToDto(projectRepository.findAllByNameContainingAndIsActive(name, true));
+        return projectConverter.convertModelToDto(projectRepository.findByName(name));
     }
 
     public List<ProjectDto> findAllActiveProjects() {
