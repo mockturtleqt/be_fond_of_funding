@@ -47,7 +47,6 @@ public class FundingService {
     public FundingInfo fundProject(FundingDto fundingDto) throws NotEnoughMoneyException, ValueNotFoundException {
         User user = userRepository.findOne(fundingDto.getUserId());
         Project project = projectRepository.findOne(fundingDto.getProjectId());
-        List<Error> errors = new ArrayList<>();
         if (nonNull(user) && nonNull(project)) {
             if (user.getBalance().compareTo(fundingDto.getAmountOfMoney()) >= 0) {
                 updateUserBalance(user, fundingDto.getAmountOfMoney());
@@ -57,6 +56,7 @@ public class FundingService {
                 throw new NotEnoughMoneyException(Collections.singletonList(buildNotEnoughMoneyError()));
             }
         }
+        List<Error> errors = new ArrayList<>();
         if (isNull(user)) {
             errors.add(buildNoSuchUserException(fundingDto.getUserId()));
         }
